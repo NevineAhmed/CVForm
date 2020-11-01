@@ -1,4 +1,5 @@
 ﻿using CVSubTask.Models;
+using CVSubTask.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,44 +15,15 @@ namespace CVSubTask.Controllers
     public class CandidateController : Controller
     {
          CVFormTaskEntities _context=new CVFormTaskEntities();
-
-        public bool isFileSupported(HttpPostedFileBase file)
-        {
-            if (file.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                || file.ContentType == "application/pdf")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool isImageSupported(HttpPostedFileBase file)
-        {
-            System.Drawing.Image sourceimage =
-            System.Drawing.Image.FromStream(file.InputStream);
-
-            var x = sourceimage.Width;
-            var y = sourceimage.Height;
-
-            if ( x <=256 && y<=256)
-            {
-                return true;
-            }
-
-            else
-            {
-                return false;
-            }
-        }
+        FileService fileService = new FileService();
+        CandidateRepository Repo = new CandidateRepository();
+        
 
         // GET: Candidate
         public ActionResult Index()
         {
-
-            var candidates = _context.Candidates.ToList();
+            //var candidates = _context.Candidates.AsEnumerable();
+            var candidates = Repo.GetAll().AsEnumerable();
             return View(candidates);
 
         }
@@ -64,47 +36,46 @@ namespace CVSubTask.Controllers
        
         
         [HttpPost]
-        public ActionResult SubmitCV(Candidate model,HttpPostedFileBase cv , HttpPostedFileBase img ,string Genders, DateTime DateOBirth)
+        public ActionResult SubmitCV(Candidate model,HttpPostedFileBase cv , HttpPostedFileBase img ,string Genders, DateTime ? DateOBirth)
         {
-            
-            if (cv == null )
+            if (DateOBirth == null)
+            {
+                ModelState.AddModelError("DateError", "Enter your date of birth");
+                return View();
+            }
+
+            if (!(fileService.isFileExist(cv)))
             {
                 ModelState.AddModelError("FileError", "No File uploaded");
                 return View();
             }
 
-            if(img == null)
+            if(!(fileService.isFileExist(img)))
             {
                 ModelState.AddModelError("Image", "No Image uploaded");
                 return View();
 
             }
 
-            if (!(isFileSupported(cv)))
+            if (!(fileService.isFileSupportedFormat(cv)))
             {
                 ModelState.AddModelError("FileError", "Unsupported format, only WORD and PDF are supported");
                 return View();
             }
 
-            if (cv.ContentLength * 1048576 > 1)                         // larger than 1024*1024
+            if (!(fileService.isFileSupportedSize(cv)))                         // larger than 1024*1024
             {
                 ModelState.AddModelError("FileError", "file too large, exceeded 1 MB");
-                
+
                 return View();
             }
 
-            if(DateOBirth == null)
+           
+
+
+            if (!(fileService.isImageSupported(img)))
             {
-                ModelState.AddModelError("DateError", "Enter your date of birth");
-                return View();
-            }
-
-
-
-            /////////////////////////////////////////////////////////////////////////////////
-            if (!(isImageSupported(img)))
-            {
-                ModelState.AddModelError("ImageError", "Not an image or not a 256 X 256 pixel image ");
+                ModelState.AddModelError("ImageError", "Not an image or exceeded 256 X 256 pixel image ");
             }
 
 
@@ -121,21 +92,27 @@ namespace CVSubTask.Controllers
                     img.SaveAs(Path.Combine(Server.MapPath("~/Content/Uploads/imgs"), ImageName));
 
                     var today = DateTime.Today;
-                    var age = today.Year - DateOBirth.Year;
+                    var age = today.Year - DateOBirth.Value.Year;
 
                     model.CV = FileName;
                     model.Image = ImageName;
                     model.Gender = Genders;
                     model.Age = age;
 
-                   
-                   
-                    _context.Candidates.Add(model);
-                    _context.SaveChanges();
+                   if(Repo.Add(model)!=null)
+                    {
+                        ModelState.Clear();
+                        model = null;
+                        ViewBag.msg = "Added!";
+                    }
 
-                    ModelState.Clear();
-                    model = null;
-                    ViewBag.msg = "Added!";
+                    else
+                    {
+                        return HttpNotFound("Not found");
+                    }
+
+
+                    
                 }
                 catch (Exception e)
                 {
@@ -148,13 +125,15 @@ namespace CVSubTask.Controllers
         }
 
         
-        public  ActionResult Delete(int? id)
+        public  ActionResult Delete(int id)
         {
-            var can=_context.Candidates.FirstOrDefault(c => c.Id == id);
-            if(can != null)
+            // var can=_context.Candidates.FirstOrDefault(c => c.Id == id);
+            var can = Repo.GetbyId(id);
+            if (can != null)
             {
-                _context.Candidates.Remove(can);
-                _context.SaveChanges();
+                //_context.Candidates.Remove(can);
+                //_context.SaveChanges();
+                Repo.Delete(id);
                 return RedirectToAction("Index");
             }
 
@@ -165,9 +144,9 @@ namespace CVSubTask.Controllers
             
         }
 
-        public ActionResult Details(int? id)
+        public ActionResult Details(int id)
         {
-            var can = _context.Candidates.FirstOrDefault(c => c.Id == id);
+            var can = Repo.GetbyId(id);
             if (can != null)
             {
 
@@ -180,9 +159,9 @@ namespace CVSubTask.Controllers
             }
         }
 
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            var can = _context.Candidates.FirstOrDefault(c => c.Id == id);
+            var can = Repo.GetbyId(id);
             if (can != null)
             {
 
@@ -218,13 +197,13 @@ namespace CVSubTask.Controllers
 
             }
 
-            if (!(isFileSupported(cv)))
+            if (!(fileService.isFileSupportedFormat(cv)))
             {
                 ModelState.AddModelError("FileError", "Unsupported format, only WORD and PDF are supported");
                 return View();
             }
 
-            if (cv.ContentLength * 1048576 > 1)                         // larger than 1024*1024
+            if (!(fileService.isFileSupportedSize(cv)))                         // larger than 1024*1024
             {
                 ModelState.AddModelError("FileError", "file too large, exceeded 1 MB");
 
@@ -232,11 +211,9 @@ namespace CVSubTask.Controllers
             }
 
 
-
-            /////////////////////////////////////////////////////////////////////////////////
-            if (!(isImageSupported(img)))
+            if (!(fileService.isImageSupported(img)))
             {
-                ModelState.AddModelError("ImageError", "Not an image or not a 256 X 256 pixel image ");
+                ModelState.AddModelError("ImageError", "Not an image or exceede 256 X 256 pixel image");
             }
 
 
@@ -261,21 +238,19 @@ namespace CVSubTask.Controllers
                     model.Age = age;
 
 
+                   if(Repo.Update(model) != null)
+                    {
+                        ModelState.Clear();
+                        model = null;
+                        ViewBag.msg = "updated!";
+                    }
 
-                  var candidate=  _context.Candidates.FirstOrDefault(a => a.Id == model.Id);
-                    candidate.FullName = model.FullName;
-                    candidate.Age = model.Age;
-                    candidate.Gender = model.Gender;
-                    candidate.City = model.City;
-                    candidate.Area = model.Area;
-                    candidate.Address = model.Address;
-                    candidate.CV = model.CV;
-                    candidate.Image = model.Image;
-                    _context.SaveChanges();
+                    else
+                    {
+                        return HttpNotFound("Notfound");
+                    }
 
-                    ModelState.Clear();
-                    model = null;
-                    ViewBag.msg = "updated!";
+                    
                 }
                 catch (Exception e)
                 {

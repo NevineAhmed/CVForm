@@ -27,7 +27,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.FullName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-5">
-                @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -61,7 +61,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Area, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Area, new { htmlAttributes = new { @class = "form-control", Type = "text" } })
+                @Html.TextBoxFor(model => model.Area, new { htmlAttributes = new { @class = "form-control", Type = "text" } })
                 @Html.ValidationMessageFor(model => model.Area, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -69,7 +69,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.City, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control", Type = "text" } })
+                @Html.TextBoxFor(model => model.City, new { htmlAttributes = new { @class = "form-control", Type = "text" } })
                 @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -77,7 +77,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -99,7 +99,7 @@
             @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
 
-                <input type="file" name="img" accept="image/*" onchange="ValidateImg()" />    @*for client validation*@
+                <input type="file" name="img" accept="image/*" onchange="ValidateImg()"  />    @*for client validation*@
                 @Html.ValidationMessage("ImageError", new { @class = "text-danger" })        @*for server validation*@
                 <span id="imageAlert" style="color:red"> </span>
             </div>
@@ -124,13 +124,13 @@
         img.src = window.URL.createObjectURL(event.target.files[0])
         img.onload = () => {
 
-            if ((img.width === 256 && img.height === 256)) {
+            if ((img.width <= 256 && img.height <= 256)) {
                 document.getElementById("imageAlert").innerHTML = "";
                 return true;
             }
             else {
 
-                document.getElementById("imageAlert").innerHTML = "Incorrect size must be 256x256 ";
+                document.getElementById("imageAlert").innerHTML = "Incorrect size not exceed 256x256";
                 return true;
             }
 

@@ -11,16 +11,26 @@ namespace CVSubTask.Models
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class Candidate
+    using System.ComponentModel.DataAnnotations;
+
+    public partial class Candidate 
     {
+        [Key]
         public int Id { get; set; }
+
+        [Required(ErrorMessage = "Full Name is required")]
         public string FullName { get; set; }
         public string Gender { get; set; }
         public int Age { get; set; }
+
         public string Area { get; set; }
+ 
         public string City { get; set; }
+
+        [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; }
+
+       
         public string CV { get; set; }
         public string Image { get; set; }
     }
