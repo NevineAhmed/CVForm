@@ -93,6 +93,11 @@ namespace CVSubTask.Controllers
 
                     var today = DateTime.Today;
                     var age = today.Year - DateOBirth.Value.Year;
+                    if (age < 0)
+                    {
+                        ModelState.AddModelError("DateError", "Invalid");
+                        return View();
+                    }
 
                     model.CV = FileName;
                     model.Image = ImageName;
@@ -231,6 +236,11 @@ namespace CVSubTask.Controllers
 
                     var today = DateTime.Today;
                     var age = today.Year - DateOBirth.Value.Year;
+                    if (age < 0)
+                    {
+                        ModelState.AddModelError("DateError", "Invalid");
+                        return View();
+                    }
 
                     model.CV = FileName;
                     model.Image = ImageName;

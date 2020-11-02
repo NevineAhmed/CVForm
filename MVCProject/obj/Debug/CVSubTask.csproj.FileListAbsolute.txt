@@ -74,7 +74,6 @@ C:\Users\compucity\source\repos\CVSubTask\obj\Debug\CVSubTask.csproj.CoreCompile
 C:\Users\compucity\source\repos\CVSubTask\obj\Debug\CVSubTask.csproj.CopyComplete
 C:\Users\compucity\source\repos\CVSubTask\obj\Debug\CVSubTask.dll
 C:\Users\compucity\source\repos\CVSubTask\obj\Debug\CVSubTask.pdb
-C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.csprojAssemblyReference.cache
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.csproj.CoreCompileInputs.cache
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.dll
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.pdb
