@@ -149,3 +149,4 @@ C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\bin\System.Web.Helpe
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\bin\System.Web.Mvc.xml
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.csproj.CopyComplete
+C:\Users\compucity\source\repos\CVTaskGit\CVForm\MVCProject\obj\Debug\CVSubTask.csprojAssemblyReference.cache
