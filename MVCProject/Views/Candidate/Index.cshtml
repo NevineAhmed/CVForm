@@ -33,7 +33,9 @@
             @Html.DisplayNameFor(model => model.CV)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Image)
+           @Html.DisplayNameFor(model => model.Image)
+            
+
         </th>
         <th></th>
     </tr>
@@ -59,10 +61,11 @@
             @Html.DisplayFor(modelItem => item.Address)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.CV)
+            @*@Html.DisplayFor(modelItem => item.CV)*@
+            <a  href="~/Content/Uploads/@item.CV">@item.CV</a>
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Image)
+            <img src="~/Content/Uploads/imgs/@item.Image" alt="no image found" width="40" height="40" />
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
