@@ -11,6 +11,7 @@
     </span>
 }
 
+
 <h2>Edit</h2>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -68,10 +69,14 @@
         cursor: pointer;
         font-size: 15px;
     }
+
+    .disabled{
+        display:none
+    }
 </style>
 
 
-@using (Html.BeginForm("Edit", "Candidate", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Edit", "Candidate", FormMethod.Post, new { enctype = "multipart/form-data" , onsubmit = "submitVal(event)" }))
 {
     @Html.AntiForgeryToken()
 
@@ -88,7 +93,7 @@
                         <div class="col-sm-2 imgUp">
                             <div class="imagePreview"></div>
                             <label class="btn btn-primary">
-                                Upload<input type="file" class="uploadFile img" value="Upload Photo" name="img" accept="image/*" onchange="ValidateImg()" style="width: 0px;height: 0px;overflow: hidden;">
+                                Upload<input type="file" id="imgFile" class="uploadFile img" value="Upload Photo" name="img" accept="image/*" onchange="ValidateImg()" style="width: 0px;height: 0px;overflow: hidden;">
 
                             </label>
                             <span id="imageAlert" style="color:red"> </span>
@@ -104,7 +109,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.FullName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-5">
-                @Html.TextBoxFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control", id = "FullName" } })
+                <span id="nameAlert" style="color:red"> </span>
                 @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -115,10 +121,11 @@
             @Html.Label("Gender", htmlAttributes: new { @class = "control-label col-md-2" })
 
             <div class="col-1">
-
-                <select class="form-control" id="CandidateGender" name="Genders">
-                    <option>Male</option>
-                    <option>Female</option>
+                <span id="genderAlert" style="color:red"> </span>
+                <select class="form-control"  id="CandidateGender" name="Genders" onchange="genderChange()">
+                    <option value="No select" selected disabled>--Select your gender--</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
                 </select>
             </div>
 
@@ -128,7 +135,8 @@
         <div class="form-group">
             @Html.Label("Date of Birth", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-5">
-                <input type="date" name="DateOBirth" />
+                <input type="date" id="dateInput" name="DateOBirth" onchange="dateChange()"/>
+                <span id="dateAlert" style="color:red"> </span>
                 @Html.ValidationMessage("DateError", new { @class = "text-danger" })
             </div>
 
@@ -163,7 +171,7 @@
             @Html.LabelFor(model => model.CV, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @* @Html.EditorFor(model => model.CV, new { htmlAttributes = new { @class = "form-control", Type = "file", name = "mohammed" } })*@
-                <input type="file" name="cv" accept=".pdf,.docx" onchange="checkSize()" />     @*for client validation*@
+                <input type="file" id="cvFile" name="cv" accept=".pdf,.docx" onchange="checkSize()" />     @*for client validation*@
                 @Html.ValidationMessage("FileError", new { @class = "text-danger" })           @*for server validation*@
                 <span id="fileAlert" style="color:red"> </span>
             </div>
@@ -175,7 +183,7 @@
 
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Save" class="btn btn-default" />
+            <input type="submit" id="submitBtn" value="Save" class="btn btn-default"  />
         </div>
     </div>
 
@@ -186,6 +194,48 @@
 </div>
 
 <script>
+
+    function genderChange() {
+        if (document.getElementById("CandidateGender").value != "No select") {
+            document.getElementById("genderAlert").innerHTML = "";
+        }
+    }
+
+    function dateChange() {
+        if ($("#dateInput").val() != null) {
+            document.getElementById("dateAlert").innerHTML = "";
+        }
+    }
+
+
+    function submitVal(event) {
+
+        var imgLength = $("#imgFile")[0].files.length;
+        if (imgLength === 0) {
+            document.getElementById("imageAlert").innerHTML = "Insert your profile photo";
+            event.preventDefault(); 
+        }
+
+        var cvLength = $("#cvFile")[0].files.length;
+        if (cvLength === 0) {
+            document.getElementById("fileAlert").innerHTML = "Insert your cv";
+            event.preventDefault();
+        }
+
+        var date = $("#dateInput").val();
+        if (date === "") {
+            document.getElementById("dateAlert").innerHTML = "Date of Birth required";
+            event.preventDefault();
+        }
+
+        if (document.getElementById("CandidateGender").value == "No select") {
+            document.getElementById("genderAlert").innerHTML = "Choose your gender";
+            event.preventDefault();
+        }
+        
+        
+
+    }
 
     $(".imgAdd").click(function () {
         $(this).closest(".row").find('.imgAdd').before('<div class="col-sm-2 imgUp"><div class="imagePreview"></div><label class="btn btn-primary">Upload<input type="file" class="uploadFile img" value="Upload Photo" style="width:0px;height:0px;overflow:hidden;"></label><i class="fa fa-times del"></i></div>');
@@ -217,7 +267,7 @@
         let img = new Image()
         img.src = window.URL.createObjectURL(event.target.files[0])
         img.onload = () => {
-
+            
             if ((img.width <= 256 && img.height <= 256)) {
                 document.getElementById("imageAlert").innerHTML = "";
                 return true;
@@ -231,23 +281,15 @@
         }
     }
 
-    function checkSize() {
+    function checkSize(input) {   //at client
 
-        //if (!(document.getElementsByName("cv")[0].value.substr(document.getElementsByName("cv")[0].value.lastIndexOf(".")) === ".pdf" || document.getElementsByName("cv")[0].value.substr(document.getElementsByName("cv")[0].value.lastIndexOf(".")) === ".docx")) {
-        //    document.getElementById("fileAlert").innerHTML = "unsupported type, must be PDF or WORD";
-        //}
-
-
-        if (event.target.files[0] != " ") {
+        var cvLength = $("#cvFile")[0].files.length;
+        if (cvLength != 0) {
             document.getElementById("fileAlert").innerHTML = "";
-
-            if (event.target.files[0].size > 1000000) {
+            if ($("#cvFile")[0].files[0].size > 1000000) {
                 document.getElementById("fileAlert").innerHTML = "File too big (max 1 MB)";
-
-                return false;
             }
-            document.getElementById("fileAlert").innerHTML = "";
-            return true;
+
         }
 
     }

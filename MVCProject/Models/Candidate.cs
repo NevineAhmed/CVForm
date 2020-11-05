@@ -20,17 +20,21 @@ namespace CVSubTask.Models
 
         [Required(ErrorMessage = "Full Name is required")]
         public string FullName { get; set; }
+
         public string Gender { get; set; }
+
         public int Age { get; set; }
 
+        [Required(ErrorMessage = "Area is required")]
         public string Area { get; set; }
- 
+
+        [Required(ErrorMessage = "City is required")]
         public string City { get; set; }
 
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; }
 
-       
+        
         public string CV { get; set; }
         public string Image { get; set; }
     }

@@ -52,7 +52,7 @@ namespace CVSubTask.Controllers
 
             if(!(fileService.isFileExist(img)))
             {
-                ModelState.AddModelError("Image", "No Image uploaded");
+                ModelState.AddModelError("ImageError", "No Image uploaded");
                 return View();
 
             }
@@ -197,7 +197,7 @@ namespace CVSubTask.Controllers
 
             if (img == null)
             {
-                ModelState.AddModelError("Image", "No Image uploaded");
+                ModelState.AddModelError("ImageError", "No Image uploaded");
                 return View();
 
             }
