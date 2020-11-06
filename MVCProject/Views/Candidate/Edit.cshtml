@@ -93,7 +93,7 @@
                         <div class="col-sm-2 imgUp">
                             <div class="imagePreview"></div>
                             <label class="btn btn-primary">
-                                Upload<input type="file" id="imgFile" class="uploadFile img" value="Upload Photo" name="img" accept="image/*" onchange="ValidateImg()" style="width: 0px;height: 0px;overflow: hidden;">
+                                Upload<input type="file" id="imgFile" class="uploadFile img" value="Upload Photo" name="img" accept="image/*" onchange="ValidateImg(event)" style="width: 0px;height: 0px;overflow: hidden;">
 
                             </label>
                             <span id="imageAlert" style="color:red"> </span>
@@ -171,7 +171,7 @@
             @Html.LabelFor(model => model.CV, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @* @Html.EditorFor(model => model.CV, new { htmlAttributes = new { @class = "form-control", Type = "file", name = "mohammed" } })*@
-                <input type="file" id="cvFile" name="cv" accept=".pdf,.docx" onchange="checkSize()" />     @*for client validation*@
+                <input type="file" id="cvFile" name="cv" accept=".pdf,.docx" onchange="validateFile()" />     @*for client validation*@
                 @Html.ValidationMessage("FileError", new { @class = "text-danger" })           @*for server validation*@
                 <span id="fileAlert" style="color:red"> </span>
             </div>
@@ -263,31 +263,45 @@
     });
 
 
-    const ValidateImg = () => {
+    const ValidateImg = (event) => {            //client
+
+        var type = document.getElementById("imgFile").type;
+        if (!(type === "image/jpg" || type === "image/png" || type === "image/gif" || type === "image/jpeg")) {
+            
+            document.getElementById("imageAlert").innerHTML = "not an image";
+        }
         let img = new Image()
         img.src = window.URL.createObjectURL(event.target.files[0])
         img.onload = () => {
-            
+
+            console.log(event.target.files[0])
             if ((img.width <= 256 && img.height <= 256)) {
                 document.getElementById("imageAlert").innerHTML = "";
+
                 return true;
             }
             else {
 
                 document.getElementById("imageAlert").innerHTML = "Incorrect size not exceed 256x256";
-                return true;
+                return false;
             }
 
         }
     }
 
-    function checkSize(input) {   //at client
+    function validateFile() {   //at client
 
         var cvLength = $("#cvFile")[0].files.length;
         if (cvLength != 0) {
             document.getElementById("fileAlert").innerHTML = "";
             if ($("#cvFile")[0].files[0].size > 1000000) {
                 document.getElementById("fileAlert").innerHTML = "File too big (max 1 MB)";
+            }
+
+            var parts = $("#cvFile")[0].files[0].name.split('.');
+            console.log(parts[1])
+            if (!(parts[1].toLowerCase() === "pdf" || parts[1].toLowerCase() === "docx")) {
+                document.getElementById("fileAlert").innerHTML = "Only word and pdf are supported";
             }
 
         }
